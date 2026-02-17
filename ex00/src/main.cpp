@@ -1,7 +1,11 @@
 #include "ScalarConverter.hpp"
-
+ 
 int main(int ac,char *av[]){
-    (void)ac;
+    if (ac != 2)
+    {
+        std::cout << "Invalid Parameters" << std::endl;
+        return (0);
+    }
     ScalarConverter::convert(av[1]);
     return (0);
 }

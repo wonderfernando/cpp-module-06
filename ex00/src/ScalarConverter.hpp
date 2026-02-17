@@ -4,6 +4,7 @@
 #include <iostream>
 #include  <cstdlib> 
 #include <cctype>
+#include <limits>
 #include <climits>
 #include <iomanip>
 # define MIN_FLOAT std::numeric_limits<float>::min() //-3.40282e+38
