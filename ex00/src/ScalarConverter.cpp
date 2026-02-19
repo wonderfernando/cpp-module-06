@@ -23,6 +23,11 @@ ScalarConverter &ScalarConverter::operator=(const ScalarConverter &other)
     return *this;
 }
 
+bool hasTwoSignal(const std::string &value)
+{
+    return (value.find('-') != std::string::npos && value.find('+') != std::string::npos);
+}
+
 bool isChar(const std::string &literal)
 {
     if (literal.length() == 1 && !isdigit(literal[0]))
@@ -39,20 +44,21 @@ bool isInt(const std::string &literal)
         return (false);
     return (true);
 }
-void convertToChar(double c)
+void convertToChar(long double c)
 {
-    char real_value = static_cast<char>(c);
-    if (static_cast<int>(c) < std::numeric_limits<char>::min() || static_cast<int>(c) > std::numeric_limits<char>::max())
-        std::cout << "char: overflow char value" << std::endl;
-    else if (!isprint(real_value))
+    if (c < 0 || c > 127)
+    {
+        std::cout << "char: impossible" << std::endl;
+        return;
+    } else if (!isprint(static_cast<char>(c)))
         std::cout << "char: is not printble" << std::endl;
     else
-        std::cout << "char: '" << real_value << "'" << std::endl;
+        std::cout << "char: '" << static_cast<char>(c) << "'" << std::endl;
 }
 
-void isCharConverter(const std::string &representation)
+void isCharConverter(const std::string &literal)
 {
-    char c = representation[0];
+    char c = literal[0];
     if (std::isprint(c))
         std::cout << "char: '" << c << "'" << std::endl;
     else
@@ -62,11 +68,11 @@ void isCharConverter(const std::string &representation)
     std::cout << "double: " << static_cast<double>(c) << ".0" << std::endl;
 }
 
-bool isInfinite(const std::string &representation)
+bool isInfinite(const std::string &literal)
 {
-    if (representation == "-inff" || representation == "+inff" ||
-        representation == "nanf" || representation == "-inf" ||
-        representation == "+inf" || representation == "nan")
+    if (literal == "-inff" || literal == "+inff" ||
+        literal == "nanf" || literal == "-inf" ||
+        literal == "+inf" || literal == "nan")
         return true;
     return false;
 }
@@ -165,22 +171,22 @@ void convertInt(long double number)
     convertToChar(number);
     if (number < std::numeric_limits<int>::min() ||
         number > std::numeric_limits<int>::max())
-        std::cout << "int: overflow integer value" << std::endl;
+        std::cout << "int: impossible" << std::endl;
     else
         std::cout << "int: " << static_cast<int>(number) << std::endl;
 
     if (number < -std::numeric_limits<float>::max() ||
         number > std::numeric_limits<float>::max())
-        std::cout << "float: overflow float value" << std::endl;
+        std::cout << "float: impossible" << std::endl;
     else
         std::cout << "float: " << static_cast<float>(number) << ".0f"
                   << std::endl;
 
     if (number < -std::numeric_limits<double>::max() ||
         number > std::numeric_limits<double>::max())
-        std::cout << "double: overflow double value" << std::endl;
+        std::cout << "double: impossible" << std::endl;
     else
-        std::cout << std::fixed << std::setprecision(1) << "double: " << (number) << std::endl;
+        std::cout <<  "double: " << (number) << ".0" << std::endl;
 }
 
 void convertToNumber(long double number)
@@ -188,13 +194,13 @@ void convertToNumber(long double number)
     convertToChar(number);
     if (number < std::numeric_limits<int>::min() ||
         number > std::numeric_limits<int>::max())
-        std::cout << "int: overflow integer value" << std::endl;
+        std::cout << "int: impossible" << std::endl;
     else
         std::cout << "int: " << static_cast<int>(number) << std::endl;
 
     if (number < -std::numeric_limits<float>::max() ||
         number > std::numeric_limits<float>::max())
-        std::cout << "float: overflow float value" << std::endl;
+        std::cout << "float: impossible" << std::endl;
     else
     {
         if (static_cast<int>(number) == static_cast<float>(number))
@@ -207,29 +213,32 @@ void convertToNumber(long double number)
 
     if (number < -std::numeric_limits<double>::max() ||
         number > std::numeric_limits<double>::max())
-        std::cout << "double: overflow double value" << std::endl;
+        std::cout << "double: impossible" << std::endl;
     else
     {
-         if (static_cast<int>(number) == static_cast<double>(number))
+        if (static_cast<int>(number) == static_cast<double>(number))
             std::cout << "double: " << static_cast<double>(number) << ".0" << std::endl;
         else
-            std::cout << "double: " << static_cast<double>(number) << std::endl ;
+            std::cout << "double: " << static_cast<double>(number) << std::endl;
     }
 }
 
 void ScalarConverter::convert(const std::string &literal)
 {
+    std::string new_value = literal;
+    size_t posPlus = literal.find('+');
+    if (posPlus != std::string::npos && posPlus == 0)
+        new_value = new_value.substr(1, literal.length() - 1);
     if (isInfinite(literal))
         infiniteNaNValues(literal);
     else if (isChar(literal))
         isCharConverter(literal);
-    if (isInt(literal))
-        convertInt(std::atof(literal.c_str()));
-    else if (isFloat(literal))
-        convertToNumber(std::atof(literal.c_str()));
-    else if (isDouble(literal))
-        convertToNumber(std::atof(literal.c_str()));
+    else if (isInt(new_value))
+        convertInt(std::atof(new_value.c_str()));
+    else if (isFloat(new_value))
+        convertToNumber(std::atof(new_value.c_str()));
+    else if (isDouble(new_value))
+        convertToNumber(std::atof(new_value.c_str()));
     else
         invalid();
-    return;
 }

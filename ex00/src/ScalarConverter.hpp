@@ -7,8 +7,7 @@
 #include <limits>
 #include <climits>
 #include <iomanip>
-# define MIN_FLOAT std::numeric_limits<float>::min() //-3.40282e+38
-# define MAX_FLOAT std::numeric_limits<float>::max() //3.40282e+38
+
 class ScalarConverter {
     public:
         static void convert(const std::string& literal);
